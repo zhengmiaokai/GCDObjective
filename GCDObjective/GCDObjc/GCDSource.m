@@ -9,12 +9,11 @@
 #import "GCDSource.h"
 
 @interface GCDSource () {
-    BOOL _repeats;
     NSTimeInterval _timeInterval;
     BOOL _isSuspend; // 是否挂起
     NSRecursiveLock* _lock;
 }
-
+@property (nonatomic, assign) BOOL repeats;
 @property (nonatomic, strong) dispatch_source_t timer;
 
 @property (nonatomic, strong) dispatch_queue_t timerQueue;
@@ -30,7 +29,7 @@
     self = [super init];
     if (self) {
         _timeInterval = timeInterval;
-        _repeats = repeats;
+        self.repeats = repeats;
         self.timerBlock = timerBlock;
         self.timerQueue = timerQueue;
         self.blockQueue = blockQueue;
