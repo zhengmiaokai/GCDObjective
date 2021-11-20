@@ -57,16 +57,19 @@
     dispatch_queue_t blockQueue = self.blockQueue ? self.blockQueue : dispatch_get_main_queue();
     
     self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, timerQueue);
+    _lock = [[NSRecursiveLock alloc] init];
     
-    __weak typeof(self) weakSelf = self;
-    dispatch_source_set_timer(_timer, dispatch_walltime(NULL, 0), _timeInterval * NSEC_PER_SEC,  0);
+    /*
+     参数二：定时器开始时间，设置为“_timeInterval * NSEC_PER_SEC”，”当前时间 + _timeInterval“ 开始
+     参数三：定时器间隔时长
+     */
+    dispatch_source_set_timer(_timer, dispatch_walltime(NULL, _timeInterval * NSEC_PER_SEC), _timeInterval * NSEC_PER_SEC,  0);
     dispatch_source_set_event_handler(_timer, ^{
-        __strong typeof(weakSelf) strongSelf = weakSelf;
         dispatch_async(blockQueue, ^{
-            strongSelf.timerBlock();
+            self.timerBlock();
         });
-        if (strongSelf->_repeats == NO) {
-            [strongSelf stopTimer];
+        if (self.repeats == NO) {
+            [self stopTimer];
         }
     });
     dispatch_resume(_timer);
