@@ -12,9 +12,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface GCDSource : NSObject
 
+/* 方法参数说明
+ * timeInterval: 定时间隔
+ * repeats：是否重复
+ * timeBlock：定时回调
+ * immediately：是否马上启动（默认为NO）
+ */
 - (instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval repeats:(BOOL)repeats timerBlock:(void(^)(void))timerBlock;
+- (instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval repeats:(BOOL)repeats timerBlock:(void(^)(void))timerBlock immediately:(BOOL)immediately;
 
-- (instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval repeats:(BOOL)repeats timerBlock:(void(^)(void))timerBlock timerQueue:(dispatch_queue_t)timerQueue blockQueue:(dispatch_queue_t)blockQueue;
+/* 方法参数说明
+ * timeInterval: 定时间隔
+ * repeats：是否重复
+ * timeBlock：定时回调
+ * timerQueue：执行定时的队列
+ * blockQueue：执行回调的队列
+ * immediately：是否马上启动（默认为NO）
+ */
+- (instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval repeats:(BOOL)repeats timerBlock:(void(^)(void))timerBlock timerQueue:(dispatch_queue_t)timerQueue blockQueue:(dispatch_queue_t)blockQueue immediately:(BOOL)immediately;
 
 - (instancetype)init UNAVAILABLE_ATTRIBUTE;
 

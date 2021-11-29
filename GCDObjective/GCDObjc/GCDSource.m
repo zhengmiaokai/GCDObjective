@@ -10,6 +10,7 @@
 
 @interface GCDSource () {
     NSTimeInterval _timeInterval;
+    BOOL _immediately; // 是否马上开始
     BOOL _isSuspend; // 是否挂起
     NSRecursiveLock* _lock;
 }
@@ -25,10 +26,11 @@
 
 @implementation GCDSource
 
-- (instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval repeats:(BOOL)repeats timerBlock:(void(^)(void))timerBlock timerQueue:(dispatch_queue_t)timerQueue blockQueue:(dispatch_queue_t)blockQueue {
+- (instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval repeats:(BOOL)repeats timerBlock:(void(^)(void))timerBlock timerQueue:(dispatch_queue_t)timerQueue blockQueue:(dispatch_queue_t)blockQueue immediately:(BOOL)immediately {
     self = [super init];
     if (self) {
         _timeInterval = timeInterval;
+        _immediately = immediately;
         self.repeats = repeats;
         self.timerBlock = timerBlock;
         self.timerQueue = timerQueue;
@@ -40,9 +42,14 @@
 }
 
 - (instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval repeats:(BOOL)repeats timerBlock:(void(^)(void))timerBlock {
+    return [self initWithTimeInterval:timeInterval repeats:repeats timerBlock:timerBlock immediately:NO];
+}
+
+- (instancetype)initWithTimeInterval:(NSTimeInterval)timeInterval repeats:(BOOL)repeats timerBlock:(void(^)(void))timerBlock immediately:(BOOL)immediately {
     self = [super init];
     if (self) {
         _timeInterval = timeInterval;
+        _immediately = immediately;
         _repeats = repeats;
         self.timerBlock = timerBlock;
         
@@ -62,7 +69,8 @@
      参数二：定时器开始时间，设置为“_timeInterval * NSEC_PER_SEC”，”当前时间 + _timeInterval“ 开始
      参数三：定时器间隔时长
      */
-    dispatch_source_set_timer(_timer, dispatch_walltime(NULL, _timeInterval * NSEC_PER_SEC), _timeInterval * NSEC_PER_SEC,  0);
+    NSTimeInterval walltime = (_immediately == YES ? 0 : _timeInterval);
+    dispatch_source_set_timer(_timer, dispatch_walltime(NULL, walltime * NSEC_PER_SEC), _timeInterval * NSEC_PER_SEC,  0);
     dispatch_source_set_event_handler(_timer, ^{
         dispatch_async(blockQueue, ^{
             self.timerBlock();
