@@ -8,10 +8,9 @@
 #import "ViewController.h"
 #import "GCDConstant.h"
 
-@interface ViewController ()
- 
-@property (nonatomic, strong) GCDGroup* group;
-@property (nonatomic, strong) GCDSource* source;
+@interface ViewController (){
+    GCDSource *_timer;
+}
 
 @end
 
@@ -21,40 +20,39 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
-    GCDSemaphore* gcd_semaphore = [GCDSemaphore semaphore];
+    /* ------------------------ group ------------------------ */
+    GCDGroup *group = [[GCDGroup alloc] init];
+    
+    [group async:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0) block:^{
+        // group task 1
+    }];
+    
+    [group async:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0) block:^{
+        // group task 2
+    }];
+    
+    [group notify:^{
+        // group finish
+    }];
+        
+    /* ------------------------ source ------------------------ */
+    _timer = [[GCDSource alloc] initWithTimeInterval:3 repeats:YES timerBlock:^{
+        // do something
+    }];
 
+    [_timer pauseTimer];
+    [_timer resumeTimer];
+    [_timer stopTimer];
+        
+    /* ----------------------- semaphore ----------------------- */
+    GCDSemaphore *semaphore = [GCDSemaphore semaphoreWithValue:0];
     [GCDQueue asyncGlobal:^{
-        
-        [gcd_semaphore wait];
-        // sleep(3);
-        [gcd_semaphore signal];
+        // do something
+        [semaphore signal];
     }];
+    [semaphore wait];
+    // continue after signal
     
-    // sleep(2);
-    
-    [gcd_semaphore wait];
-    
-    [gcd_semaphore signal];
-    
-    
-    self.group = [[GCDGroup alloc] init];
-    
-    [_group asyncQueue:dispatch_queue_create("222", DISPATCH_QUEUE_SERIAL) block:^{
-         sleep(2);
-    }];
-    
-    [_group asyncQueue:dispatch_queue_create("111", DISPATCH_QUEUE_SERIAL) block:^{
-         sleep(3);
-    }];
-    
-    [_group notify:^{
-    
-    }];
-    
-    
-    self.source = [[GCDSource alloc] initWithTimeInterval:3 repeats:YES timerBlock:^{
-        
-    }];
 }
 
 

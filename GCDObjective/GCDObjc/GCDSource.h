@@ -2,13 +2,11 @@
 //  GCDSource.h
 //  Basic
 //
-//  Created by mikazheng on 2019/7/19.
+//  Created by zhengmiaokai on 2019/7/19.
 //  Copyright © 2019 zhengmiaokai. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-
-NS_ASSUME_NONNULL_BEGIN
 
 @interface GCDSource : NSObject
 
@@ -41,14 +39,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-NS_ASSUME_NONNULL_END
+/* 示例
+ ----------------------------------------------------------------------------
+ _timer = [[GCDSource alloc] initWithTimeInterval:3 repeats:YES timerBlock:^{
+     // do something
+ }];
 
-/*
-self.source = [[GCDSource alloc] initWithTimeInterval:3 repeats:YES timerBlock:^{
-    
-}];
-
-[_source pauseTimer];
-[_source resumeTimer];
-[_source stopTimer];
+ [_timer pauseTimer];
+ [_timer resumeTimer];
+ [_timer stopTimer];
+ ----------------------------------------------------------------------------
  */

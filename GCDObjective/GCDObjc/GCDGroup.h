@@ -14,16 +14,32 @@
 
 @interface GCDGroup : NSObject
 
-- (void)enter; //+1   为0时触发notify
+- (void)enter; // +1，为0时触发notify
 
-- (void)leave; //-1   为0时触发notify
+- (void)leave; // -1，为0时触发notify
 
-- (void)async:(void(^)(void))block;//异步并行
+- (void)async:(dispatch_queue_t)queue block:(void (^)(void))block; // 异步执行
 
-- (void)asyncQueue:(dispatch_queue_t)queue block:(void (^)(void))block;
+- (void)notify:(void(^)(void))block; // 回调到主线程
 
-- (void)notify:(void(^)(void))block;//回调到主线程
-
-- (void)wait:(NSTimeInterval)timeInterval;//类似于 sleep(2),阻塞线程 随着 enter->leave 失效
+- (void)wait:(NSTimeInterval)timeInterval; //类似于sleep(2)阻塞线程，随着enter->leave失效
 
 @end
+
+/* 示例
+ -------------------------------------------------------------------------
+ GCDGroup *group = [[GCDGroup alloc] init];
+ 
+ [group async:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0) block:^{
+     // group task 1
+ }];
+ 
+ [group async:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0) block:^{
+     // group task 2
+ }];
+ 
+ [group notify:^{
+     // group finish
+ }];
+ -------------------------------------------------------------------------
+ */

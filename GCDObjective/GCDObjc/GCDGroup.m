@@ -11,7 +11,6 @@
 @interface GCDGroup ()
 
 @property (nonatomic, strong) dispatch_group_t group;
-@property (nonatomic, strong) dispatch_queue_t queue;
 
 @end
 
@@ -21,7 +20,6 @@
     self = [super init];
     if (self) {
         self.group = dispatch_group_create();
-        self.queue = dispatch_queue_create("GCD_CONCURRENT_QUEUE", DISPATCH_QUEUE_CONCURRENT);
     }
     return self;
 }
@@ -34,11 +32,7 @@
     dispatch_group_leave(_group);
 }
 
-- (void)async:(void(^)(void))block {
-    dispatch_group_async(_group, _queue, block);
-}
-
-- (void)asyncQueue:(dispatch_queue_t)queue block:(void (^)(void))block {
+- (void)async:(dispatch_queue_t)queue block:(void (^)(void))block {
     dispatch_group_async(_group, queue, block);
 }
 
@@ -51,38 +45,3 @@
 }
 
 @end
-
-/*用法
- -------------------------------------------------
- GCDGroup* group = [[GCDGroup alloc] init];
- 
- [group asyncQueue:dispatch_queue_create("222", DISPATCH_QUEUE_SERIAL) block:^{
-      sleep(8);
- }];
- 
- [group asyncQueue:dispatch_queue_create("111", DISPATCH_QUEUE_SERIAL) block:^{
-      sleep(4);
- }];
- 
- [group notify:^{
- 
- }];
- --------------------------------------------------
- GCDGroup* group = [[GCDGroup alloc] init];
- [group enter];
- [group enter];
- [GCDQueue asyncQueue:dispatch_queue_create("222", DISPATCH_QUEUE_SERIAL) block:^{
-      sleep(8);
-      [group leave];
- }];
- 
- [GCDQueue asyncQueue:dispatch_queue_create("111", DISPATCH_QUEUE_SERIAL) block:^{
-      sleep(4);
-      [group leave];
- }];
- 
- [group notify:^{
- 
- }];
- --------------------------------------------------
- */
